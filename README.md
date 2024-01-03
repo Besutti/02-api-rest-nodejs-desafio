@@ -20,5 +20,5 @@ Nesse desafio desenvolveremos uma API para controle de dieta diária, a Daily Di
         * Quantidade total de refeições dentro da dieta
         * Quantidade total de refeições fora da dieta
         * Melhor sequência de refeições dentro da dieta
-    - [] O usuário só pode visualizar, editar e apagar as refeições o qual ele criou
+    - [] O usuário só pode visualizar, editar e apagar as refeições o qual ele criou;
 
