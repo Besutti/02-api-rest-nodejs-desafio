@@ -5,32 +5,47 @@ import { randomUUID } from 'crypto'
 import { checkSessionIdExists } from '../middlewares/check-session-id-exists'
 
 export async function userRoutes(app: FastifyInstance) {
-  // app.addHook('preHandler', async (request, reply) => {
-  //   console.log(`[${request.method}] ${request.url}`)
-  // })
+  app.addHook('preHandler', async (request, reply) => {
+    console.log(`[${request.method}] ${request.url}`)
+  })
 
   app.get(
     '/',
     {
-      // preHandler: [checkSessionIdExists], por enquanto nada ainda
+      preHandler: [checkSessionIdExists],
     },
-    async (request, reply) => {
-
-      por aqui eu vou ter que fazer os esquemas 
-      
+    async (request) => {
       const { sessionId } = request.cookies
 
-      const transactions = await knex('transactions')
-        .where('session_id', sessionId)
-        .select()
-
-      // se retornar assim vai retornar direto um array
-      // return transactions
-      // então o interessante é retornar um objeto e seu array
+      const users = await knex('users').where('session_id', sessionId).select()
 
       return {
-        transactions,
+        users,
       }
+    },
+  )
+
+  app.delete(
+    '/:id',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request, reply) => {
+      const getUsersParamsSchema = z.object({
+        id: z.string().uuid(),
+      })
+      const { sessionId } = request.cookies
+
+      const { id } = getUsersParamsSchema.parse(request.params)
+
+      await knex('users')
+        .where({
+          id,
+          session_id: sessionId,
+        })
+        .delete()
+
+      return reply.status(204).send()
     },
   )
 
@@ -40,16 +55,14 @@ export async function userRoutes(app: FastifyInstance) {
       preHandler: [checkSessionIdExists],
     },
     async (request) => {
-      const getTransactionsParamsSchema = z.object({
+      const getUsersParamsSchema = z.object({
         id: z.string().uuid(),
       })
       const { sessionId } = request.cookies
 
-      const { id } = getTransactionsParamsSchema.parse(request.params)
+      const { id } = getUsersParamsSchema.parse(request.params)
 
-      const transaction = await knex('transactions')
-        // .where('id', id)
-        // .andWhere('session_id', sessionId)
+      const user = await knex('users')
         .where({
           id,
           session_id: sessionId,
@@ -57,7 +70,7 @@ export async function userRoutes(app: FastifyInstance) {
         .first()
       // se não utilizar first() ele vai retornar como um array
 
-      return { transaction }
+      return { user }
     },
   )
 
@@ -79,15 +92,12 @@ export async function userRoutes(app: FastifyInstance) {
   )
 
   app.post('/', async (request, reply) => {
-    const createTransactionBodySchema = z.object({
-      title: z.string(),
-      amount: z.number(),
-      type: z.enum(['credit', 'debit']),
+    const createUserBodyShema = z.object({
+      nome: z.string(),
+      email: z.string(),
     })
 
-    const { title, amount, type } = createTransactionBodySchema.parse(
-      request.body,
-    )
+    const { nome, email } = createUserBodyShema.parse(request.body)
 
     let sessionId = request.cookies.sessionId
 
@@ -96,14 +106,14 @@ export async function userRoutes(app: FastifyInstance) {
 
       reply.cookie('sessionId', sessionId, {
         path: '/',
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 dias
+        maxAge: 1000 * 60 * 60 * 24 * 7,
       })
     }
 
-    await knex('transactions').insert({
+    await knex('users').insert({
       id: randomUUID(),
-      title,
-      amount: type === 'credit' ? amount : amount * -1,
+      nome,
+      email,
       session_id: sessionId,
     })
 

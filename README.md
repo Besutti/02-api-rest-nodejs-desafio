@@ -4,12 +4,8 @@ Nesse desafio desenvolveremos uma API para controle de dieta diária, a Daily Di
     https://efficient-sloth-d85.notion.site/Desafio-02-be7cdb37aaf74ba898bc6336427fa410 
 
 # Regras da Aplicação
-    - [] Deve ser possível criar um usuário;
-        * id
-        * session_id
-        * nome
-        * email
-    - [] Deve ser possível identificar o usuário entre as requisições;
+    - [x] Deve ser possível criar um usuário;
+    - [x] Deve ser possível identificar o usuário entre as requisições;
     - [] Deve ser possível registrar uma refeição feita, com as seguintes informações;
         * Nome
         * Descrição
