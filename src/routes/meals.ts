@@ -66,19 +66,57 @@ export async function mealsRoutes(app: FastifyInstance) {
         .orderBy('created_at', 'desc')
 
       // tentativa da sequencia
-      const ultimaData = 0
+
+      let contador = 0
+      let melhorContador = 0
       for (let index = 0; index < total.length; index++) {
         const element = total[index]
 
-        tenho que terminar por aqui 
-        
-        console.log(element)
+        if (element.its_diet) {
+          contador += 1
+        } else {
+          contador = 0
+        }
+
+        if (contador > melhorContador) {
+          melhorContador = contador
+        }
+
+        // console.log(element.created_at.split(' ')[0])
       }
+      console.log(melhorContador)
+
+      // const numeros = [1, 2, 3, 4, 5]
+      // const soma = numeros.reduce(function (acumulador, valorAtual) {
+      //   return acumulador + valorAtual
+      // }, 0)
+      // console.log(soma)
+
+      // teste do exemplo
+      // const { bestOnDietSequence } = total.reduce(
+      //   (acc, meal) => {
+      //     if (meal.its_diet) {
+      //       acc.currentSequence += 1
+      //     } else {
+      //       acc.currentSequence = 0
+      //     }
+
+      //     if (acc.currentSequence > acc.bestOnDietSequence) {
+      //       acc.bestOnDietSequence = acc.currentSequence
+      //     }
+
+      //     return acc
+      //   },
+      //   { bestOnDietSequence: 0, currentSequence: 0 },
+      // )
+
+      // console.log(bestOnDietSequence)
 
       return reply.send({
         totalMeals: meals?.meals,
         totalMealsDiet: mealsDiet?.mealsDiet,
         totalMealsNotDiet: mealsNotDiet?.mealsNotDiet,
+        melhorSequencia: melhorContador,
         // totalMealsOffDiet: totalMealsOffDiet?.total,
         // bestOnDietSequence,
       })
